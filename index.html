@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sister's Ultimate Otaku Profile Card</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.7.0/vanilla-tilt.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Zen+Tokyo+Zoo&display=swap');
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: 'Zen Tokyo Zoo', cursive;
+            background: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .glass {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-radius: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
+        }
+
+        .skill-btn {
+            opacity: 0;
+            transform: translateY(100px);
+        }
+
+        #profile-pic {
+            transition: all 0.5s ease;
+        }
+
+        #profile-pic:hover {
+            transform: rotate(360deg) scale(1.2);
+        }
+
+        .korean-symbol {
+            position: absolute;
+            font-size: 24px;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        #bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: -1;
+        }
+
+        @keyframes powerUp {
+            0% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.7); }
+            70% { box-shadow: 0 0 0 20px rgba(255, 255, 255, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
+        }
+
+        .power-up {
+            animation: powerUp 1s infinite;
+        }
+
+        .lightning {
+            position: absolute;
+            width: 2px;
+            height: 20px;
+            background: #fff;
+            opacity: 0;
+        }
+
+        .kanji {
+            position: absolute;
+            font-size: 24px;
+            opacity: 0.5;
+            pointer-events: auto;
+            cursor: help;
+        }
+
+        .kanji:hover::after {
+            content: attr(data-translation);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: #fff;
+            padding: 5px;
+            border-radius: 5px;
+            font-size: 14px;
+            white-space: nowrap;
+        }
+
+        .motion-line {
+            position: absolute;
+            background: #fff;
+            height: 2px;
+            width: 20px;
+            opacity: 0;
+        }
+
+        .sparkle {
+            position: absolute;
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background-color: #fff;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .energy-burst {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0) 70%);
+            opacity: 0;
+            pointer-events: none;
+        }
+        .text-purple-300 {
+    color: #b794f4; 
+    font-size: 14px; 
+    margin-top: 8px; 
+}
+
+    </style>
+</head>
+<body class="text-white">
+    <canvas id="bg-canvas"></canvas>
+    <div class="glass p-6 w-80 text-center" id="profile-card">
+        <img src="https://i.ibb.co/MMp2thy/downloadfile-20.jpg" alt="Profile Picture" class="w-32 h-32 rounded-full mx-auto mb-4 border-4 border-pink-300" id="profile-pic">
+        <h2 class="text-2xl font-bold text-purple-300 mb-2">Kim 반테 <sub>aka</sub> KIM</h2>
+        <p class="text-pink-300 mb-4">アナンドの大切な妹</p>
+        <div class="flex flex-wrap justify-center gap-2 mb-4">
+            <button class="skill-btn bg-gradient-to-r from-pink-400 to-purple-400 text-white px-3 py-1 rounded-full text-sm">Html</button>
+            <button class="skill-btn bg-gradient-to-r from-purple-400 to-pink-400 text-white px-3 py-1 rounded-full text-sm">Css</button>
+            <button class="skill-btn bg-gradient-to-r from-pink-400 to-purple-400 text-white px-3 py-1 rounded-full text-sm">Python</button>
+            <button class="skill-btn bg-gradient-to-r from-purple-400 to-pink-400 text-white px-3 py-1 rounded-full text-sm">Java Script</button>
+        </div>
+        <button id="unleash-btn" class="bg-gradient-to-r from-pink-500 to-purple-500 text-white px-4 py-2 rounded-lg hover:from-pink-600 hover:to-purple-600 transition duration-300">Click for Original Skills!</button>
+        <p class="text-purple-300 text-sm">Chasing dreams with a 미소, unstoppable 정신</p>
+    </div>
+   <audio id="anime-music" loop>
+        <source src="https://dl.dropboxusercontent.com/scl/fi/j1zfrwgutk5pqvzdexlcx/Anime-song-mp3cut.net.mp3?rlkey=bm8k0hj8v9oc71x2ojyps901c&dl=0" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+    <script>
+        const skillButtons = document.querySelectorAll('.skill-btn');
+        const unleashBtn = document.getElementById('unleash-btn');
+        const body = document.body;
+
+        const originalSkills = ['HTML', 'CSS', 'Python', 'Javascript'];
+        const poweredUpSkills = ['화나다', '오해', '실망하다', '질투하다'];
+
+        const koreanSymbols = [
+            'ㄱ', 'ㄴ', 'ㄷ', 'ㄹ', 'ㅁ', 'ㅂ', 'ㅅ', 'ㅇ', 'ㅈ', 'ㅊ', 'ㅋ', 'ㅌ', 'ㅍ', 'ㅎ',
+            '가', '나', '다', '라', '마', '바', '사', '아', '자', '차', '카', '타', '파', '하',
+            'ア', 'イ', 'ウ', 'エ', 'オ', 'カ', 'キ', 'ク', 'ケ', 'コ', 'サ', 'シ', 'ス', 'セ', 'ソ',
+            'タ', 'チ', 'ツ', 'テ', 'ト', 'ナ', 'ニ', 'ヌ', 'ネ', 'ノ', 'ハ', 'ヒ', 'フ', 'ヘ', 'ホ',
+            'マ', 'ミ', 'ム', 'メ', 'モ', 'ヤ', 'ユ', 'ヨ', 'ラ', 'リ', 'ル', 'レ', 'ロ', 'ワ', 'ヲ', 'ン'
+        ];
+
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('bg-canvas') });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+
+        const geometry = new THREE.TorusGeometry(10, 3, 16, 100);
+        const material = new THREE.MeshBasicMaterial({ color: 0xff6ad5, wireframe: true });
+        const torus = new THREE.Mesh(geometry, material);
+        scene.add(torus);
+
+        camera.position.z = 30;
+
+        function animateBackground() {
+            requestAnimationFrame(animateBackground);
+            torus.rotation.x += 0.01;
+            torus.rotation.y += 0.005;
+            renderer.render(scene, camera);
+        }
+
+        function animateSkills() {
+            anime({
+                targets: '.skill-btn',
+                translateY: [100, 0],
+                opacity: [0, 1],
+                delay: anime.stagger(200),
+                duration: 1000,
+                easing: 'easeOutElastic(1, .5)'
+            });
+        }
+
+        function createKoreanSymbol() {
+            const symbol = document.createElement('div');
+            symbol.classList.add('korean-symbol');
+            symbol.style.color = `hsl(${Math.random() * 360}, 100%, 75%)`;
+            symbol.style.left = `${Math.random() * window.innerWidth}px`;
+            symbol.style.top = `${Math.random() * window.innerHeight}px`;
+            symbol.textContent = koreanSymbols[Math.floor(Math.random() * koreanSymbols.length)];
+            body.appendChild(symbol);
+
+            anime({
+                targets: symbol,
+                opacity: [0, 0.5, 0],
+                translateY: [100, -100],
+                rotate: () => anime.random(-360, 360),
+                duration: 4000,
+                easing: 'easeOutQuad',
+                complete: () => body.removeChild(symbol)
+            });
+
+            setTimeout(createKoreanSymbol, Math.random() * 1000 + 500);
+        }
+
+        function createLightning() {
+            const lightning = document.createElement('div');
+            lightning.classList.add('lightning');
+            lightning.style.left = `${Math.random() * window.innerWidth}px`;
+            lightning.style.top = `${Math.random() * window.innerHeight}px`;
+            lightning.style.transform = `rotate(${Math.random() * 360}deg)`;
+            body.appendChild(lightning);
+
+            anime({
+                targets: lightning,
+                opacity: [0, 1, 0],
+                scaleY: [0, 1],
+                duration: 200,
+                easing: 'linear',
+                complete: () => body.removeChild(lightning)
+            });
+
+            setTimeout(createLightning, Math.random() * 1000 + 100);
+        }
+
+        function createKanji() {
+            const kanjiList = [
+                { char: '力', translation: 'Power' },
+                { char: '闘', translation: 'Fight' },
+                { char: '友', translation: 'Friend' },
+                { char: '愛', translation: 'Love' },
+                { char: '勇', translation: 'Courage' }
+            ];
+            const kanji = document.createElement('div');
+            const randomKanji = kanjiList[Math.floor(Math.random() * kanjiList.length)];
+            kanji.classList.add('kanji');
+            kanji.textContent = randomKanji.char;
+            kanji.setAttribute('data-translation', randomKanji.translation);
+            kanji.style.left = `${Math.random() * window.innerWidth}px`;
+            kanji.style.top = `${Math.random() * window.innerHeight}px`;
+            body.appendChild(kanji);
+
+            anime({
+                targets: kanji,
+                opacity: [0, 0.5, 0],
+                translateY: [-50, 50],
+                duration: 4000,
+                easing: 'easeOutQuad',
+                complete: () => body.removeChild(kanji)
+            });
+
+            setTimeout(createKanji, Math.random() * 2000 + 1000);
+        }
+
+        function createMotionLines() {
+            const profilePic = document.getElementById('profile-pic');
+            const rect = profilePic.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+
+            for (let i = 0; i < 8; i++) {
+                const line = document.createElement('div');
+                line.classList.add('motion-line');
+                const angle = (i / 8) * Math.PI * 2;
+                const distance = 100;
+                line.style.left = `${centerX + Math.cos(angle) * distance}px`;
+                line.style.top = `${centerY + Math.sin(angle) * distance}px`;
+                line.style.transform = `rotate(${angle + Math.PI / 2}rad)`;
+                body.appendChild(line);
+
+                anime({
+                    targets: line,
+                    opacity: [0, 0.5, 0],
+                    translateX: [`${Math.cos(angle) * 20}px`, `${Math.cos(angle) * 40}px`],
+                    translateY: [`${Math.sin(angle) * 20}px`, `${Math.sin(angle) * 40}px`],
+                    duration: 1000,
+                    easing: 'easeOutQuad',
+                    complete: () => body.removeChild(line)
+                });
+            }
+        }
+
+        function createSparkle() {
+            const sparkle = document.createElement('div');
+            sparkle.classList.add('sparkle');
+            sparkle.style.left = `${Math.random() * window.innerWidth}px`;
+            sparkle.style.top = `${Math.random() * window.innerHeight}px`;
+            body.appendChild(sparkle);
+
+            anime({
+                targets: sparkle,
+                opacity: [0, 1, 0],
+                scale: [0, 1],
+                translateX: anime.random(-50, 50),
+                translateY: anime.random(-50, 50),
+                duration: 1000,
+                easing: 'easeOutQuad',
+                complete: () => body.removeChild(sparkle)
+            });
+        }
+
+        function createEnergyBurst(x, y) {
+            const burst = document.createElement('div');
+            burst.classList.add('energy-burst');
+            burst.style.left = `${x - 50}px`;
+            burst.style.top = `${y - 50}px`;
+            body.appendChild(burst);
+
+            anime({
+                targets: burst,
+                opacity: [0, 0.8, 0],
+                scale: [0, 1.5],
+                duration: 1000,
+                easing: 'easeOutQuad',
+               complete: () => body.removeChild(burst)
+            });
+        }
+
+        unleashBtn.addEventListener('click', function() {
+            skillButtons.forEach((btn, index) => {
+                btn.textContent = poweredUpSkills[index];
+                  const music = document.getElementById('anime-music');
+            music.play();
+            });
+
+            anime({
+                targets: '.skill-btn',
+                translateX: function() { return anime.random(-150, 150); },
+                translateY: function() { return anime.random(-150, 150); },
+                rotate: function() { return anime.random(-360, 360); },
+                scale: function() { return anime.random(0.5, 2); },
+                opacity: 0,
+                duration: 1000,
+                easing: 'easeOutExpo',
+                complete: function(anim) {
+                    anime({
+                        targets: '.skill-btn',
+                        translateX: 0,
+                        translateY: 0,
+                        rotate: 0,
+                        scale: 1,
+                        opacity: 1,
+                        duration: 1000,
+                        delay: anime.stagger(200),
+                        easing: 'easeOutElastic(1, .5)'
+                    });
+                }
+            });
+
+            anime({
+                targets: '#profile-card',
+                translateX: [
+                    { value: -10, duration: 50, easing: 'easeInOutQuad' },
+                    { value: 10, duration: 100, easing: 'easeInOutQuad' },
+                    { value: -10, duration: 100, easing: 'easeInOutQuad' },
+                    { value: 10, duration: 100, easing: 'easeInOutQuad' },
+                    { value: -10, duration: 100, easing: 'easeInOutQuad' },
+                    { value: 0, duration: 50, easing: 'easeInOutQuad' }
+                ],
+                translateY: [
+                    { value: -10, duration: 50, easing: 'easeInOutQuad' },
+                    { value: 10, duration: 100, easing: 'easeInOutQuad' },
+                    { value: -10, duration: 100, easing: 'easeInOutQuad' },
+                    { value: 10, duration: 100, easing: 'easeInOutQuad' },
+                    { value: -10, duration: 100, easing: 'easeInOutQuad' },
+                    { value: 0, duration: 50, easing: 'easeInOutQuad' }
+                ],
+                duration: 500
+            });
+
+            // Add power-up effect to profile picture
+            const profilePic = document.getElementById('profile-pic');
+            profilePic.classList.add('power-up');
+            setTimeout(() => profilePic.classList.remove('power-up'), 3000);
+
+            // Create motion lines
+            createMotionLines();
+
+            // Create lightning bolts
+            for (let i = 0; i < 20; i++) {
+                setTimeout(createLightning, Math.random() * 1000);
+            }
+
+            // Create sparkles
+            for (let i = 0; i < 50; i++) {
+                setTimeout(createSparkle, Math.random() * 2000);
+            }
+
+            // Create energy burst
+            const rect = profilePic.getBoundingClientRect();
+            createEnergyBurst(rect.left + rect.width / 2, rect.top + rect.height / 2);
+
+            setTimeout(() => {
+                skillButtons.forEach((btn, index) => {
+                    btn.textContent = originalSkills[index];
+                });
+            }, 8000);
+        });
+
+        window.addEventListener('load', () => {
+            animateSkills();
+            animateBackground();
+    
+            for (let i = 0; i < 10; i++) {
+                setTimeout(createKoreanSymbol, Math.random() * 2000);
+            }
+
+            
+            for (let i = 0; i < 5; i++) {
+                setTimeout(createKanji, Math.random() * 2000);
+            }
+
+        
+            setInterval(createSparkle, 2000);
+        });
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+        
+        VanillaTilt.init(document.getElementById("profile-card"), {
+            max: 15,
+            speed: 500,
+            glare: true,
+            "max-glare": 0.2
+        });
+
+    </script>
+</body>
+</html>
